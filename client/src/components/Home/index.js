@@ -15,7 +15,8 @@ import Radio from "@material-ui/core/Radio";
 import Button from "@material-ui/core/Button";
 
 //Dev mode
-const serverURL = ""; //enable for dev mode
+const serverURL = "http://ec2-18-216-101-119.us-east-2.compute.amazonaws.com:3086"; //enable for dev mode         http://localhost:5000
+// http://ec2-18-216-101-119.us-east-2.compute.amazonaws.com:3086
 
 //Deployment mode instructions
 //const serverURL = "http://ov-research-4.uwaterloo.ca:PORT"; //enable for deployed mode; Change PORT to the port number given to you;
@@ -77,14 +78,49 @@ const styles = theme => ({
 
 });
 
+// React Components
 const MovieSelection = (props) => {
   const classes = styles;
   const [movie, setMovie] = React.useState('');
+  const [apiMovies, setApiMovies] = React.useState([]);
+
+  const loadMovies = () => {
+    callApiGetMovies()
+      .then(res => {
+        console.log("callApiGetMovies returned: ", res)
+        var parsed = JSON.parse(res.express);
+        console.log("callApiGetMovies parsed: ", parsed);
+        setApiMovies(parsed);
+      })
+  }
+  
+  const callApiGetMovies = async () => {
+  
+    const url = serverURL + "/api/getMovies";
+    console.log(url);
+  
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    console.log("getMovies : ", body);
+    return body;
+  }
 
   const handleChange = (event) => {
-    props.movie(event.target.value);
+    props.movie(event.target.value.name);
+    props.movieId(event.target.value.id);
     setMovie(event.target.value);
   };
+
+  React.useEffect(() => {
+    loadMovies();
+    console.log(apiMovies);
+  }, []);
 
   return (
     <>
@@ -96,11 +132,11 @@ const MovieSelection = (props) => {
           value={movie}
           onChange={handleChange}
         >
-          <MenuItem value={"Star Wars III: Revenge of the Sith"}>Star Wars III: Revenge of the Sith</MenuItem>
-          <MenuItem value={"Avengers 4: Endgame"}>Avengers 4: Endgame</MenuItem>
-          <MenuItem value={"John Wick"}>John Wick</MenuItem>
-          <MenuItem value={"The Gentlemen"}>The Gentlemen</MenuItem>
-          <MenuItem value={"The Penguins of Madagascar"}>The Penguins of Madagascar</MenuItem>
+          {apiMovies.map((movie) => {
+            return (
+              <MenuItem value={movie}>{movie.name}</MenuItem>
+            )
+          })}
         </Select>
       </FormControl>
     </>
@@ -199,16 +235,74 @@ const Review = () => {
   const [selectedRating, setSelectedRating] = useState("0");
   const [error, setError] = useState("");
   const [finalDisplay, setFinalDisplay] = useState("none");
+  const [selectedMovieId, setSelectedMovieId] = useState(0);
+
+  const insertReview = (review) => {
+    callApiAddReview(review)
+      .then(res => {
+        console.log("callApiAddReview returned: ", res)
+        var parsed = JSON.parse(res.express);
+        console.log("callApiAddReview parsed: ", parsed);
+      })
+  }
+  
+  const callApiAddReview = async (review) => {
+  
+    const url = serverURL + "/api/addReview";
+    console.log(url);
+  
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        review: {
+          title: review.title,
+          body: review.body,
+          score: review.score,
+          user: review.user,
+          movie: review.movie
+        }
+      })
+    });
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    console.log("Found recipes: ", body);
+    return body;
+  }
 
   const onClick = () => {
     if (selectedMovie == "" || enteredTitle == "" || enteredReview == "" || selectedRating == "0") {
-      setError("Please fill in all values!");
+      let errors = [];
+      if (selectedMovie == "") {
+        errors.push('Movie')
+      }
+      if (enteredTitle == "") {
+        errors.push('Title')
+      }
+      if (enteredReview == "") {
+        errors.push('Body')
+      }
+      if (selectedRating == "0") {
+        errors.push('Rating')
+      }
+      setError("Please fill in the following values: " + errors.join(', '));
       setFinalDisplay("none")
     } else {
       if (error != "") {
         setError("");
       }
       setFinalDisplay("block")
+      let insertValue = {
+        title: enteredTitle,
+        body: enteredReview, 
+        score: selectedRating, 
+        user: 1, 
+        movie: selectedMovieId
+      };
+      console.log(insertValue);
+      insertReview(insertValue);
     }
   }
 
@@ -218,7 +312,7 @@ const Review = () => {
       <p style={{"color": "red"}}>{error}</p>
       <Grid container>
         <Grid item>
-          <MovieSelection movie={setSelectedMovie} />
+          <MovieSelection movie={setSelectedMovie} movieId={setSelectedMovieId} />
         </Grid>
         <Grid item>
           <ReviewTitle title={setEnteredTitle} />
