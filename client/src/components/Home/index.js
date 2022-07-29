@@ -13,9 +13,11 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import Radio from "@material-ui/core/Radio";
 import Button from "@material-ui/core/Button";
+import NavigationBar from "../AppBar/index";
 
 //Dev mode
-const serverURL = "http://ec2-18-216-101-119.us-east-2.compute.amazonaws.com:3086"; //enable for dev mode         http://localhost:5000
+const serverURL = "http://ec2-18-216-101-119.us-east-2.compute.amazonaws.com:3086"; //enable for dev mode
+//http://localhost:5000
 // http://ec2-18-216-101-119.us-east-2.compute.amazonaws.com:3086
 
 //Deployment mode instructions
@@ -398,7 +400,7 @@ class Home extends Component {
         style={{ minHeight: '100vh' }}
         className={classes.mainMessageContainer}
       >
-        <Grid item>
+        {/* <Grid item>
 
           <Typography
             variant={"h3"}
@@ -416,7 +418,7 @@ class Home extends Component {
             )}
           </Typography>
 
-        </Grid>
+        </Grid> */}
         <Grid item>
           <Review />
         </Grid>
@@ -426,6 +428,7 @@ class Home extends Component {
 
     return (
       <MuiThemeProvider theme={theme}>
+        <NavigationBar></NavigationBar>
         <div className={classes.root}>
           <CssBaseline />
           <Paper
