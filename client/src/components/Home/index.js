@@ -16,7 +16,7 @@ import Button from "@material-ui/core/Button";
 import NavigationBar from "../AppBar/index";
 
 //Dev mode
-const serverURL = "http://ec2-18-216-101-119.us-east-2.compute.amazonaws.com:3086"; //enable for dev mode
+const serverURL = ""; //enable for dev mode
 //http://localhost:5000
 // http://ec2-18-216-101-119.us-east-2.compute.amazonaws.com:3086
 
