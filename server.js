@@ -105,7 +105,7 @@ app.post('/api/mypage', (req, res) => {
 
 	let connection = mysql.createConnection(config);
 
-	let sql = `SELECT * FROM ai3siddi.movies`;
+	let sql = `INSERT INTO trailers (movieID, url) VALUES (${req.body.movie}, '${req.body.url}')`;
 	
 	console.log(sql);
 
@@ -121,6 +121,6 @@ app.post('/api/mypage', (req, res) => {
 	connection.end();
 });
 
-app.listen(port, () => console.log(`Listening on port ${port}`)); //for the dev version
+// app.listen(port, () => console.log(`Listening on port ${port}`)); //for the dev version
 // app.listen(port, '129.97.25.211'); //for the deployed version, specify the IP address of the server
-// app.listen(port, '172.31.31.77') 
+app.listen(port, '172.31.31.77') 

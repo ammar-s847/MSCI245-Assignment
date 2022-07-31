@@ -116,7 +116,7 @@ const MovieSelection = (props) => {
   const handleChange = (event) => {
     props.movie(event.target.value.name);
     props.movieId(event.target.value.id);
-    setMovie(event.target.value);
+    setMovie(event.target.value.name);
   };
 
   React.useEffect(() => {
@@ -169,6 +169,7 @@ const TrailerURL = (props) => {
 const MyPageComponent = () => {
   const [trailer, setTrailer] = useState("");
   const [selectedMovieId, setSelectedMovieId] = useState(0);
+  const [movieName, setMovieName] = useState("");
 
   const insertTrailer = (review) => {
     callApiAddTrailer(review)
@@ -190,15 +191,13 @@ const MyPageComponent = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        review: {
-          movie: trailer.movie,
-          url: trailer.url
-        }
+        movie: trailer.movie,
+        url: trailer.url
       })
     });
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
-    console.log("Found recipes: ", body);
+    console.log("Inserted Trailer: ", body);
     return body;
   }
 
@@ -216,7 +215,7 @@ const MyPageComponent = () => {
       <h2>Contribute by adding a Trailer link!</h2>
       <Grid container>
         <Grid item>
-          <MovieSelection movieId={setSelectedMovieId} />
+          <MovieSelection movie={setMovieName} movieId={setSelectedMovieId} />
         </Grid>
         <Grid item>
           <TrailerURL setter={setTrailer} />
@@ -229,7 +228,7 @@ const MyPageComponent = () => {
         <Grid item>
           <div>
             <h3>Trailer: </h3>
-            <iframe width="560" height="315" src={trailer} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <p>{TrailerURL}</p>
           </div>
         </Grid>
       </Grid>
